@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
+import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
 
 import "./PathfindingVisualizer.css";
 
@@ -38,11 +39,49 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid: newGrid });
   }
 
+  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          this.animateShortestPath(nodesInShortestPathOrder);
+        }, 10 * i);
+        return;
+      }
+      setTimeout(() => {
+        const node = visitedNodesInOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          "node node-visited";
+      }, 10 * i);
+    }
+  }
+
+  animateShortestPath(nodesInShortestPathOrder) {
+    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
+      setTimeout(() => {
+        const node = nodesInShortestPathOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          "node node-shortest-path";
+      }, 50 * i);
+    }
+  }
+
+  visualizeDijkstra() {
+    const { grid } = this.state;
+    const startNode = grid[START_NODE_ROW][START_NODE_COL];
+    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
+    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
+  }
+
   render() {
     const { grid, isMousePressed } = this.state;
 
     return (
       <>
+        <button onClick={() => this.visualizeDijkstra()}>
+          Visualize Dijkstra's Algorithm
+        </button>
         <div className="grid">
           {grid.map((row, rowIndex) => {
             return (
@@ -60,7 +99,9 @@ export default class PathfindingVisualizer extends Component {
                       isMousePressed={isMousePressed}
                       onMouseUp={() => this.handleMouseUp()}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                      onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
+                      onMouseEnter={(row, col) =>
+                        this.handleMouseEnter(row, col)
+                      }
                     ></Node>
                   );
                 })}
