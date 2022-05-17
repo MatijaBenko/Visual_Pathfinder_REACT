@@ -12,6 +12,19 @@ export default class Navbar extends Component {
               Benko Pathfinding Visualizer
             </a>
           </div>
+          <div className="navbar-child">
+            <select>
+              <option value="Dijstrka's Algorithm">
+                Dijstrka's Algorithm
+              </option>
+              <option value="A* Algorithm">
+                A* Algorithm
+              </option>
+            </select>
+          </div>
+          <div className="navbar-child">
+            <button>Visualize</button>
+          </div>
         </div>
       </nav>
     );
