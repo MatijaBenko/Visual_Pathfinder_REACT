@@ -1,4 +1,4 @@
-import React, { Component, useRef } from "react";
+import React, { Component} from "react";
 
 import "./Navbar.css";
 
@@ -15,6 +15,7 @@ export default class Navbar extends Component {
   handleChangeAlgorithm(e) {
     this.setState({ algorithmType: e.target.value });
     this.handleChangeButton(e.target.value);
+    this.props.handler(e.target.value);
   }
 
   render() {

@@ -16,7 +16,17 @@ export default class PathfindingVisualizer extends Component {
     this.state = {
       grid: [],
       isMousePressed: false,
+      algorthimType: "",
+      mazeType: "",
     };
+    this.algorthimTypeHandler = this.algorthimTypeHandler.bind(this);
+  }
+
+  algorthimTypeHandler(type) {
+    this.setState({
+      algorthimType: type
+    });
+    console.log(this.algorthimType);
   }
 
   // Prevents user from seeing intermediate states
@@ -80,7 +90,7 @@ export default class PathfindingVisualizer extends Component {
 
     return (
       <>
-      <Navbar></Navbar>
+      <Navbar handler={this.algorthimTypeHandler}></Navbar>
         <button onClick={() => this.visualizeDijkstra()}>
           Visualize Dijkstra's Algorithm
         </button>
