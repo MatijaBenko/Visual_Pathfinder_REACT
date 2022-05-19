@@ -15,7 +15,18 @@ export default class Navbar extends Component {
   handleChangeAlgorithm(e) {
     this.setState({ algorithmType: e.target.value });
     this.handleChangeButton(e.target.value);
-    this.props.handler(e.target.value);
+  }
+
+  visualButtonClick = () => {
+    if(this.state.algorithmType == null){
+      alert("Please select an Algorithm type!");
+    } else {
+      this.props.visualizeAlgorithm(this.state.algorithmType);
+    }
+  }
+
+  clearButtonClick = () => {
+    this.props.clearVisualization();
   }
 
   render() {
@@ -37,7 +48,10 @@ export default class Navbar extends Component {
             </select>
           </div>
           <div className="navbar-child">
-            <button id="visual-button">Visualize</button>
+            <button id="visual-button" onClick={this.visualButtonClick}>Visualize</button>
+          </div>
+          <div className="navbar-child">
+            <button id="clear-button" onClick={this.clearButtonClick}>Clear Board</button>
           </div>
         </div>
       </nav>
