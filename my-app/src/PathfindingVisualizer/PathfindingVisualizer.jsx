@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
+import { astar } from "../algorithms/astar";
 import Navbar from "../Navbar/Navbar";
 
 import "./PathfindingVisualizer.css";
@@ -63,13 +64,13 @@ export default class PathfindingVisualizer extends Component {
   };
 
   visualizeA() {
-    console.log("HERE");
-    // const { grid } = this.state;
-    // const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    // const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    // // const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    // const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    // // this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
+    const { grid } = this.state;
+    const startNode = grid[START_NODE_ROW][START_NODE_COL];
+    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
+    const heuristic = null;
+    const visitedNodesInOrder = astar(grid, heuristic, startNode, finishNode);
+    //const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    // this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
   }
 
   animateA(visitedNodesInOrder, nodesInShortestPathOrder) {
@@ -127,7 +128,7 @@ export default class PathfindingVisualizer extends Component {
             return (
               <div key={rowIndex}>
                 {row.map((node, nodeIndex) => {
-                  const { row, col, isFinish, isStart, isWall } = node;
+                  const { row, col, isFinish, isStart, isWall, heuristicDistance, weight } = node;
                   return (
                     <Node
                       key={nodeIndex}
@@ -136,7 +137,9 @@ export default class PathfindingVisualizer extends Component {
                       isFinish={isFinish}
                       isStart={isStart}
                       isWall={isWall}
+                      heuristicDistance={heuristicDistance}
                       isMousePressed={isMousePressed}
+                      weight = {weight}
                       onMouseUp={() => this.handleMouseUp()}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
                       onMouseEnter={(row, col) =>
@@ -175,6 +178,9 @@ const createNode = (col, row) => {
     distance: Infinity,
     isVisited: false,
     isWall: false,
+    heuristicDistance: null,
+    weight: 0,
+    totalDistance: Infinity,
     previousNode: null,
   };
 };
