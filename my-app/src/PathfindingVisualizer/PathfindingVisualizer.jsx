@@ -1,9 +1,18 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
-import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
+import {
+  dijkstra,
+  getNodesInShortestPathOrderDijkstra,
+} from "../algorithms/dijkstra";
 import Navbar from "../Navbar/Navbar";
 
 import "./PathfindingVisualizer.css";
+import { astar, getNodesInShortestPathOrderAstar } from "../algorithms/astar";
+import {
+  depthfirstsearch,
+  getNodesInShortestPathOrderDFS,
+} from "../algorithms/depthfirstsearch";
+import { breadthfirstsearch, getNodesInShortestPathOrderBFS } from "../algorithms/breadthfirstsearch";
 
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
@@ -51,53 +60,39 @@ export default class PathfindingVisualizer extends Component {
   }
 
   visualizeAlgorithm = (algorithmType) => {
-    if (algorithmType === "Dijstrka's Algorithm") {
-      this.visualizeDijkstra();
-    } else if (algorithmType === "A* Algorithm") {
-      this.visualizeA();
-    }
-  };
-
-  clearVisualization = () => {
-    clearBoard(this.state.grid);
-  };
-
-  visualizeA() {
-    console.log("HERE");
-    // const { grid } = this.state;
-    // const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    // const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    // // const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    // const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    // // this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
-  }
-
-  animateA(visitedNodesInOrder, nodesInShortestPathOrder) {
-    // for (let i = 0; i <= visitedNodesInOrder.length; i++) {
-    //   if (i === visitedNodesInOrder.length) {
-    //     setTimeout(() => {
-    //       this.animateShortestPath(nodesInShortestPathOrder);
-    //     }, 10 * i);
-    //     return;
-    //   }
-    //   setTimeout(() => {
-    //     const node = visitedNodesInOrder[i];
-    //     document.getElementById(`node-${node.row}-${node.col}`).className =
-    //       "node node-visited";
-    //   }, 10 * i);
-    // }
-  }
-
-  visualizeDijkstra() {
     const { grid } = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-    const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
-  }
+    let visitedNodesInOrder = null;
+    let nodesInShortestPathOrder = null;
 
-  animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
+    if (algorithmType === "Dijstrka's Algorithm") {
+      visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+      nodesInShortestPathOrder =
+        getNodesInShortestPathOrderDijkstra(finishNode);
+      getNodesInShortestPathOrderDijkstra(finishNode);
+    } else if (algorithmType === "A* Algorithm") {
+      visitedNodesInOrder = astar(grid, startNode, finishNode);
+      nodesInShortestPathOrder = getNodesInShortestPathOrderAstar(finishNode);
+    } else if (algorithmType === "DFS Algorithm") {
+      visitedNodesInOrder = depthfirstsearch(grid, startNode, finishNode);
+      nodesInShortestPathOrder = getNodesInShortestPathOrderDFS(finishNode);
+    } else if (algorithmType === "BFS Algorithm") {
+      visitedNodesInOrder = breadthfirstsearch(grid, startNode, finishNode);
+      nodesInShortestPathOrder = getNodesInShortestPathOrderBFS(finishNode);
+    }
+    this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
+  };
+
+  clearVisuals = () => {
+    clearVisuals(this.state.grid);
+  };
+
+  resetVisualization = () => {
+    resetBoard(this.state.grid);
+  };
+
+  animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
         setTimeout(() => {
@@ -120,7 +115,8 @@ export default class PathfindingVisualizer extends Component {
       <>
         <Navbar
           visualizeAlgorithm={this.visualizeAlgorithm}
-          clearVisualization={this.clearVisualization}
+          resetVisualization={this.resetVisualization}
+          clearVisuals={this.clearVisuals}
         ></Navbar>
         <div className="grid">
           {grid.map((row, rowIndex) => {
@@ -173,7 +169,9 @@ const createNode = (col, row) => {
     isStart: row === START_NODE_ROW && col === START_NODE_COL,
     isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
     distance: Infinity,
+    totalDistance: Infinity,
     isVisited: false,
+    isShortest: false,
     isWall: false,
     previousNode: null,
   };
@@ -191,7 +189,7 @@ const getNewGridWithWallToggle = (grid, row, col) => {
   return newGrid;
 };
 
-const clearBoard = (grid) => {
+const resetBoard = (grid) => {
   for (var i = 0; i < grid.length; i++) {
     for (var j = 0; j < grid[i].length; j++) {
       grid[i][j].previousNode = null;
@@ -221,5 +219,40 @@ const clearBoard = (grid) => {
       }
     }
   }
-  console.log(grid);
+};
+
+const clearVisuals = (grid) => {
+  for (var i = 0; i < grid.length; i++) {
+    for (var j = 0; j < grid[i].length; j++) {
+      grid[i][j].previousNode = null;
+      grid[i][j].distance = Infinity;
+      grid[i][j].isVisited = false;
+      if (
+        (i === START_NODE_ROW && j === START_NODE_COL) ||
+        (i === FINISH_NODE_ROW && j === FINISH_NODE_COL)
+      ) {
+        if (i === START_NODE_ROW && j === START_NODE_COL) {
+          grid[i][j].isStart = true;
+          document.getElementById(`node-${i}-${j}`).className =
+            "node node-start";
+        } else {
+          grid[i][j].isStart = false;
+        }
+        if (i === FINISH_NODE_ROW && j === FINISH_NODE_COL) {
+          grid[i][j].isFinish = true;
+          document.getElementById(`node-${i}-${j}`).className =
+            "node node-finish";
+        } else {
+          grid[i][j].isFinish = false;
+        }
+      } else {
+        if (grid[i][j].isWall) {
+          document.getElementById(`node-${i}-${j}`).className =
+            "node node-wall";
+        } else {
+          document.getElementById(`node-${i}-${j}`).className = "node";
+        }
+      }
+    }
+  }
 };

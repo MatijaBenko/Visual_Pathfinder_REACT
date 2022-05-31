@@ -1,4 +1,8 @@
 export function dijkstra(grid, startNode, finishNode) {
+  if (!startNode || !finishNode || startNode === finishNode) {
+    return [];
+  }
+  
   const visitedNodesInOrder = [];
   startNode.distance = 0;
   const unvistedNodes = getAllNodes(grid);
@@ -46,7 +50,7 @@ function getUnvisitedNeighbors(node, grid) {
   return neighbors.filter((neighbor) => !neighbor.isVisited);
 }
 
-export function getNodesInShortestPathOrder(finishNode) {
+export function getNodesInShortestPathOrderDijkstra(finishNode) {
   const nodesInShortestPathOrder = [];
   let currentNode = finishNode;
   while (currentNode !== null) {
