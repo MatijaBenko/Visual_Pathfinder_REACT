@@ -1,9 +1,14 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
+<<<<<<< HEAD
 import {
   dijkstra,
   getNodesInShortestPathOrderDijkstra,
 } from "../algorithms/dijkstra";
+=======
+import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
+import { astar } from "../algorithms/astar";
+>>>>>>> a00f790c068bdfe39efab759a6c2499e1d806950
 import Navbar from "../Navbar/Navbar";
 
 import "./PathfindingVisualizer.css";
@@ -123,7 +128,7 @@ export default class PathfindingVisualizer extends Component {
             return (
               <div key={rowIndex}>
                 {row.map((node, nodeIndex) => {
-                  const { row, col, isFinish, isStart, isWall } = node;
+                  const { row, col, isFinish, isStart, isWall, heuristicDistance, weight } = node;
                   return (
                     <Node
                       key={nodeIndex}
@@ -132,7 +137,9 @@ export default class PathfindingVisualizer extends Component {
                       isFinish={isFinish}
                       isStart={isStart}
                       isWall={isWall}
+                      heuristicDistance={heuristicDistance}
                       isMousePressed={isMousePressed}
+                      weight = {weight}
                       onMouseUp={() => this.handleMouseUp()}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
                       onMouseEnter={(row, col) =>
@@ -173,6 +180,9 @@ const createNode = (col, row) => {
     isVisited: false,
     isShortest: false,
     isWall: false,
+    heuristicDistance: null,
+    weight: 0,
+    totalDistance: Infinity,
     previousNode: null,
   };
 };
