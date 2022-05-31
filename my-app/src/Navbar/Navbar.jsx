@@ -1,4 +1,4 @@
-import React, { Component} from "react";
+import React, { Component } from "react";
 
 import "./Navbar.css";
 
@@ -13,20 +13,26 @@ export default class Navbar extends Component {
   }
 
   handleChangeAlgorithm(e) {
-    this.setState({ algorithmType: e.target.value });
-    this.handleChangeButton(e.target.value);
+    if (e.target.value !== "Algorithm Type") {
+      this.setState({ algorithmType: e.target.value });
+      this.handleChangeButton(e.target.value);
+    }
   }
 
   visualButtonClick = () => {
-    if(this.state.algorithmType == null){
+    if (this.state.algorithmType === "") {
       alert("Please select an Algorithm type!");
     } else {
       this.props.visualizeAlgorithm(this.state.algorithmType);
     }
-  }
+  };
+
+  resetButtonClick = () => {
+    this.props.resetVisualization();
+  };
 
   clearButtonClick = () => {
-    this.props.clearVisualization();
+    this.props.clearVisuals();
   }
 
   render() {
@@ -43,15 +49,29 @@ export default class Navbar extends Component {
               value={this.state.algorithmType}
               onChange={this.handleChangeAlgorithm}
             >
+              <option defaultValue="" style={{ fontWeight: "bold" }}>
+                Algorithm Type
+              </option>
               <option value="Dijstrka's Algorithm">Dijstrka's Algorithm</option>
               <option value="A* Algorithm">A* Algorithm</option>
+              <option value="DFS Algorithm">DFS Algorithm</option>
+              <option value="BFS Algorithm">BFS Algorithm</option>
             </select>
           </div>
           <div className="navbar-child">
-            <button id="visual-button" onClick={this.visualButtonClick}>Visualize</button>
+            <button id="visual-button" onClick={this.visualButtonClick}>
+              Visualize
+            </button>
           </div>
           <div className="navbar-child">
-            <button id="clear-button" onClick={this.clearButtonClick}>Clear Board</button>
+            <button id="clear-button" onClick={this.clearButtonClick}>
+              Clear Visuals
+            </button>
+          </div>
+          <div className="navbar-child">
+            <button id="reset-button" onClick={this.resetButtonClick}>
+              Reset Board
+            </button>
           </div>
         </div>
       </nav>
