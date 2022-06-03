@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
-import { dijkstra, getNodesInShortestPathOrderDijkstra } from "../algorithms/dijkstra";
+import {
+  dijkstra,
+  getNodesInShortestPathOrderDijkstra,
+} from "../algorithms/dijkstra";
 import Navbar from "../Navbar/Navbar";
 
 import "./PathfindingVisualizer.css";
@@ -13,6 +16,9 @@ import {
   breadthfirstsearch,
   getNodesInShortestPathOrderBFS,
 } from "../algorithms/breadthfirstsearch";
+import { recursivedivision } from "../mazealgorithms/recursiveDivision";
+import { vertical } from "../mazealgorithms/vertical";
+import { random } from "../mazealgorithms/random";
 
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
@@ -49,16 +55,6 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid: newGrid });
   }
 
-  animateShortestPath(nodesInShortestPathOrder) {
-    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
-      setTimeout(() => {
-        const node = nodesInShortestPathOrder[i];
-        document.getElementById(`node-${node.row}-${node.col}`).className =
-          "node node-shortest-path";
-      }, 50 * i);
-    }
-  }
-
   visualizeAlgorithm = (algorithmType) => {
     const { grid } = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
@@ -88,6 +84,26 @@ export default class PathfindingVisualizer extends Component {
     clearVisuals(this.state.grid);
   };
 
+  createMaze = (mazeType) => {
+    const { grid } = this.state;
+    const startNode = grid[START_NODE_ROW][START_NODE_COL];
+    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
+    let nodeWalls;
+
+    if (mazeType === "Recursive Division") {
+      nodeWalls = recursivedivision(grid, startNode, finishNode);
+    } else if (mazeType === "Vertical") {
+      nodeWalls = vertical(grid, startNode, finishNode);
+    } else if (mazeType === "Random") {
+      nodeWalls = random(grid, startNode, finishNode);
+    }
+    for (let i = 0; i < nodeWalls.length; i++) {
+      const node = nodeWalls[i];
+      grid[node.row][node.col].isWall = true;
+    }
+    this.animateMaze(nodeWalls);
+  };
+
   resetVisualization = () => {
     resetBoard(this.state.grid);
   };
@@ -108,6 +124,27 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
+  animateShortestPath(nodesInShortestPathOrder) {
+    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
+      setTimeout(() => {
+        const node = nodesInShortestPathOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          "node node-shortest-path";
+      }, 50 * i);
+    }
+  }
+
+  animateMaze(nodeWalls) {
+    if (nodeWalls === undefined) return;
+    for (let i = 0; i < nodeWalls.length; i++) {
+      setTimeout(() => {
+        const node = nodeWalls[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          "node node-maze";
+      }, 50 * i);
+    }
+  }
+
   render() {
     const { grid, isMousePressed } = this.state;
 
@@ -117,6 +154,7 @@ export default class PathfindingVisualizer extends Component {
           visualizeAlgorithm={this.visualizeAlgorithm}
           resetVisualization={this.resetVisualization}
           clearVisuals={this.clearVisuals}
+          createMaze={this.createMaze}
         ></Navbar>
         <div className="grid">
           {grid.map((row, rowIndex) => {
@@ -185,7 +223,6 @@ const createNode = (col, row) => {
     isWall: false,
     heuristicDistance: null,
     weight: 0,
-    totalDistance: Infinity,
     previousNode: null,
   };
 };
